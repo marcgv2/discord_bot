@@ -1,0 +1,12 @@
+19-08-2025 13:55:59 UTC-1 - marcgv2 (754699798287745085)
+warehouse command used; parameters:
+item: none, position: none, results_count: 3 
+-------------------------------------------------------------
+19-08-2025 14:17:22 UTC-1 - marcgv2 (754699798287745085)
+warehouse_add command used; parameters:
+item: something, position: Z3 
+-------------------------------------------------------------
+19-08-2025 14:17:47 UTC-1 - marcgv2 (754699798287745085)
+warehouse_remove command used; parameters:
+item: something, locaton: none 
+-------------------------------------------------------------
