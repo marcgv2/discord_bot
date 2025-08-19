@@ -1,0 +1,73 @@
+const { SlashCommandBuilder } = require('discord.js');
+const fs = require('fs').promises;
+const path = require('path');
+
+// Path to your JSON storage file
+const DATA_PATH = path.join(__dirname, 'patternData.json');
+
+module.exports = {
+    data: new SlashCommandBuilder()
+        .setName('pattern')
+        .setDescription('Count how many times "aba" appears in a string and store results')
+        .addStringOption(option =>
+            option.setName('input')
+                .setDescription('The string to search in')
+                .setRequired(true)),
+    
+    async execute(interaction) {
+        await interaction.deferReply();
+        
+        const input = interaction.options.getString('input');
+        const pattern = 'aba';
+        const user = interaction.user.tag;
+        const userid = interaction.user.id;
+        const timestamp = new Date().toISOString();
+
+        // Count occurrences
+        const matches = input.match(new RegExp(pattern, 'g')) || [];
+        const count = matches.length;
+        const positions = [];
+        let index = input.indexOf(pattern);
+        
+        while (index !== -1) {
+            positions.push(index);
+            index = input.indexOf(pattern, index + 1);
+        }
+
+        // Prepare the data to store
+        const resultData = {
+            user,
+            userid,
+            timestamp,
+            input,
+            pattern,
+            count,
+        };
+
+        try {
+            // Read existing data
+            let allData = [];
+            try {
+                const fileContent = await fs.readFile('./lb/data.json', 'utf-8');
+                allData = JSON.parse(fileContent);
+            } catch (error) {
+                if (error.code !== 'ENOENT') throw error;
+            }
+
+            // Add new result
+            allData.push(resultData);
+
+            // Write back to file
+            await fs.writeFile(DATA_PATH, JSON.stringify(allData, null, 2));
+
+            let response = `Found "${pattern}" ${count} times in your input.\n`;
+            response += `Total records stored: ${allData.length}\n`;
+            response += `Positions: ${positions.join(', ') || 'none'}`;
+            
+            await interaction.editReply(response);
+        } catch (error) {
+            console.error('Error handling data:', error);
+            await interaction.editReply('❌ An error occurred while processing your request.');
+        }
+    }
+};
