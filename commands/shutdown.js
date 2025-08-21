@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 const { exec } = require('child_process');
+const logger = require('../utils/logger')
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -12,7 +13,11 @@ module.exports = {
         await interaction.reply({ ephemeral: true, content: 'shutdown in process' });
         
         try {
-            // Get the PM2 app name from environment variable or use default
+
+            // log command
+            logger.log('shutdown', interaction.user, {
+                response: 'shutdown initiated'
+            })
             const pm2AppName = process.env.PM2_APP_NAME || 'gayland_bot';
             
             // Execute PM2 stop command
